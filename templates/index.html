@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Dyne.org IPR checker</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["'Syne', sans-serif"]
+                    },
+                    colors: {
+                        primary: '#FCEFDF',
+                    }
+                }
+            }
+        }
+
+        function showSpinner() {
+            document.getElementById("spinner").classList.remove('hidden');
+            document.getElementById("submit").style.display = "none";
+        }
+    </script>
+</head>
+
+<body class="bg-primary p-8 h-screen">
+    <div class="w-full flex flex-wrap">
+
+        <div class="w-full md:w-1/2 flex flex-col">
+            <div class="flex flex-col justify-start pt-2 md:pt-0 px-8 md:px-12 lg:px-24">
+                <h1 class="text-center mb-8 text-3xl font-semibold">
+                    Dyne.org IPR checker
+                </h1>
+                <p class="text-center text-3xl">Welcome.</p>
+                <form class="flex flex-col pt-3 md:pt-8" method="post">
+                    <div class="flex flex-col pt-4">
+                        <label for="repo" class="text-lg">Repo</label>
+                        <input type="url" name="repo" id="repo" placeholder="https://github.com/{user}/{repo}"
+                            class="border w-full py-2 px-3 text-gray-700 mt-1 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <input type="submit" value="Check" id="submit"
+                        class="bg-black text-white font-bold text-lg hover:bg-gray-700 p-2 mt-8"
+                        onclick="showSpinner();">
+                    <div id="spinner" class="grid w-100 place-items-center hidden py-2 m-2">
+                        <div class="w-12 h-12 border-8 border-gray-600 rounded-full loader"></div>
+                    </div>
+                    <style>
+                        @keyframes loader-rotate {
+                            0% {
+                                transform: rotate(0);
+                            }
+
+                            100% {
+                                transform: rotate(360deg);
+                            }
+                        }
+
+                        .loader {
+                            border-right-color: transparent;
+                            animation: loader-rotate 1s linear infinite;
+                        }
+                    </style>
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- Image Section -->
+        <div class="w-1/2 prose hover:whitespace-pre-wrap">
+            {{ result }}
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>
