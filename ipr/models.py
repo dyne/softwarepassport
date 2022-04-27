@@ -11,6 +11,8 @@ class Scans(Base):
     identifier = Column(String, index=True, unique=True)
     reuse_report = Column(String, index=True)
     scancode_report = Column(String, index=True)
+    sawroom_tag = Column(String, index=True)
+    fabric_tag = Column(String, index=True)
     date_created = Column(DateTime, default=datetime.utcnow)
     date_last_updated = Column(DateTime, default=datetime.utcnow)
     description = Column(String, index=True)

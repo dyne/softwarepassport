@@ -1,17 +1,14 @@
+import logging
 import uvicorn
-from fastapi import FastAPI, Request, Form, Depends
+from fastapi import FastAPI, Request, Response, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
-import pygit2
-import tempfile
+
 from markupsafe import Markup
 import markdown
-from reuse import lint
-from reuse.project import Project
-from io import StringIO
-from scancode import cli
-import shutil
 from sqlalchemy.orm import Session
+
+from ipr.repo import Repo
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
@@ -21,6 +18,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates/")
+L = logging.getLogger("uvicorn.error")
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,6 +28,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+async def catch_exceptions_middleware(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except Exception as e:
+        L.exception(e)
+        error = f"""
+# Opps! Something went wrong!
+
+```
+{e}
+```
+        """
+
+        return templates.TemplateResponse(
+            "index.html",
+            context={"request": request, "result": Markup(markdown.markdown(error))},
+            status_code=500,
+        )
+
+
+app.middleware("http")(catch_exceptions_middleware)
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -37,12 +58,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-class AttrDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
 
 
 @app.get("/")
@@ -56,47 +71,23 @@ async def root(request: Request):
 def form_post(request: Request, repo: str = Form(...), db: Session = Depends(get_db)):
     previous_scan = crud.get_scan_by_repo(db, repo)
     if previous_scan:
-        return templates.TemplateResponse(
-            "index.html", context={"request": request, "result": "Repo already scanned"}
-        )
-
-    class Progress(pygit2.RemoteCallbacks):
-        def transfer_progress(self, stats):
-            print(f"{stats.indexed_objects}/{stats.total_objects}")
-
-    print("Cloning project")
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        pygit2.clone_repository(repo, tmpdir, callbacks=Progress())
-        print("Cloned")
-        args = AttrDict(
-            {
-                "no_multiprocessing": False,
-                "quiet": False,
-                "verbose": True,
-                "debug": True,
-            }
-        )
-        result = StringIO()
-        lint.run(args, project=Project(tmpdir), out=result)
-        scancode_report = cli.run_scan(tmpdir)
-        reuse_report = result.getvalue().replace(tmpdir, "")
-        crud.create_scan(
-            db=db,
-            scan=dict(
-                reuse_report=reuse_report,
-                identifier=repo,
-                scancode_report=str(scancode_report),
-            ),
-        )
-        shutil.rmtree(tmpdir)
+        L.warning("Scan for %s already exists", repo)
         return templates.TemplateResponse(
             "index.html",
             context={
                 "request": request,
-                "result": Markup(markdown.markdown(reuse_report)),
+                "result": Markup(markdown.markdown("## Repo already scanned")),
             },
         )
+    project = Repo(repo)
+    project.scan(db)
+    return templates.TemplateResponse(
+        "index.html",
+        context={
+            "request": request,
+            "result": Markup(markdown.markdown(project.report)),
+        },
+    )
 
 
 @app.get("/scans/", response_model=list[schemas.Scan])

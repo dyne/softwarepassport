@@ -7,7 +7,8 @@ from pydantic import BaseModel
 class ScanBase(BaseModel):
     identifier: str
     reuse_report: str
-    description: Optional[str] = None
+    sawroom_tag: Optional[str] = None
+    fabric_tag: Optional[str] = None
     scancode_report: Optional[str] = None
 
 
