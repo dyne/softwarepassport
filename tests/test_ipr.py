@@ -2,15 +2,14 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from ipr.app import app, get_db
 from ipr.database import Base
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -29,13 +28,24 @@ def test_db():
     yield
     Base.metadata.drop_all(bind=engine)
 
+
 app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
+
 def test_index(test_db):
     response = client.get("/")
-    print(response)
 
     assert response.status_code == 200
-    assert response.json() == []
+    assert response.json() == [
+        {"name": "openapi", "path": "/openapi.json"},
+        {"name": "swagger_ui_html", "path": "/docs"},
+        {"name": "swagger_ui_redirect", "path": "/docs/oauth2-redirect"},
+        {"name": "redoc_html", "path": "/redoc"},
+        {"name": "root", "path": "/"},
+        {"name": "list_all_projects", "path": "/projects"},
+        {"name": "create_or_update_a_new_project", "path": "/project"},
+        {"name": "scan", "path": "/scan"},
+        {"name": "status", "path": "/status"},
+    ]
