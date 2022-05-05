@@ -11,16 +11,13 @@ start = "ipr.app:start"
 python = "^3.9"
 fastapi = "^0.75.2"
 uvicorn = {extras = ["standard"], version = "^0.17.6"}
-Jinja2 = "^3.1.1"
-python-multipart = "^0.0.5"
-pygit2 = "^1.9.1"
 reuse = "^0.14.0"
-Markdown = "^3.3.6"
-MarkupSafe = "^2.1.1"
 scancode-toolkit = "^30.1.0"
 sh = "^1.14.2"
 SQLAlchemy = "^1.4.35"
 requests = "^2.27.1"
+GitPython = "^3.1.27"
+aiosqlite = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
