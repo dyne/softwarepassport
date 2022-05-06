@@ -81,7 +81,7 @@ const Home: NextPage = () => {
                 <td>{repository.reuse_compliant ? "✅" : "🚫"}</td>
                 <td>
                   <FabricModal fabric_tag={repository.fabric_tag} />
-                  <SawroomModal sawroom_tag={repository.fabric_tag} />
+                  <SawroomModal sawroom_tag={repository.sawroom_tag} />
                 </td>
                 <td>
                   <button className="btn btn-xs">re-scan</button>

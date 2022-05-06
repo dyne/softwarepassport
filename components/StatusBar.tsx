@@ -3,8 +3,8 @@ const StatusBar = ({ status }) => {
   const steps = {
     "clone": { start: 1, end: 2 },
     "reuse": { start: 3, end: 4 },
-    "license scan": { start: 5, end: 6 },
-    "notarize": { start: 7, end: 8 },
+    "notarize": { start: 5, end: 6 },
+    "license scan": { start: 7, end: 8 },
   }
 
   const getState = (step: string) => {
