@@ -25,10 +25,10 @@ class State(enum.Enum):
     CLONE_END = 2
     REUSE_START = 3
     REUSE_END = 4
-    SCANCODE_START = 5
-    SCANCODE_END = 6
-    BLOCKCHAIN_START = 7
-    BLOCKCHAIN_END = 8
+    SCANCODE_START = 7
+    SCANCODE_END = 8
+    BLOCKCHAIN_START = 5
+    BLOCKCHAIN_END = 6
 
 
 class Project(Base):
@@ -102,11 +102,7 @@ class Project(Base):
         data = dict(
             data=dict(
                 input=dict(
-                    url=self.url,
-                    hash=self.hash,
-                    reuse_compliant=self.reuse_compliant,
-                    reuse_report=self.reuse_report,
-                    scancode_report=self.scancode_report,
+                    url=self.url, hash=self.hash, reuse_compliant=self.reuse_compliant
                 )
             )
         )
@@ -121,8 +117,8 @@ class Project(Base):
         L.info("Scanning project %s", self.url)
         self.clone(db)
         self.reuse(db)
-        self.scancode(db)
         self.blockchain(db)
+        self.scancode(db)
         self.save(db)
 
     def save(self, db: Session):
@@ -182,4 +178,6 @@ class AuditLog(Base):
             .filter(cls.date_created >= start.date_created)
             .order_by(desc(cls.state))
             .all()
+            if start
+            else []
         )

@@ -17,7 +17,6 @@ sh = "^1.14.2"
 SQLAlchemy = "^1.4.35"
 requests = "^2.27.1"
 GitPython = "^3.1.27"
-aiosqlite = "^0.17.0"
 celery = "^5.2.6"
 redis = "^4.2.2"
 
@@ -25,6 +24,7 @@ redis = "^4.2.2"
 pytest = "^5.2"
 black = {version = "^22.3.0", allow-prereleases = true}
 pytest-cov = "^3.0.0"
+flower = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

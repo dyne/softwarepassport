@@ -1,7 +1,9 @@
 import logging
 
 import uvicorn
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
+from celery import Celery
+from celery.utils.log import get_task_logger
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -12,8 +14,15 @@ from .database import SessionLocal, engine
 from .models import AuditLog, Base, Project
 from .schemas import RepoBase
 
+# import billiard as multiprocessing
+
+
 Base.metadata.create_all(bind=engine)
 
+celery = Celery(
+    __name__, broker=settings.CELERY_BROKER, backend=settings.CELERY_BACKEND
+)
+celery_log = get_task_logger(__name__)
 
 app = FastAPI()
 L = logging.getLogger("uvicorn.error")
@@ -76,10 +85,19 @@ def create_or_update_a_new_repository(
     return repo
 
 
+@celery.task
+def scan_task(url):
+    celery_log.info(f"{url} START scan")
+    db = SessionLocal()
+    repo = Project.by_url(url, db)
+    print(repo)
+    repo.scan(db)
+    celery_log.info(f"{url} END scan")
+
+
 @app.post("/scan", status_code=HTTP_202_ACCEPTED)
 async def scan(
     repository: RepoBase,
-    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     """
@@ -89,8 +107,7 @@ async def scan(
     if not repo:
         raise HTTPException(status_code=404, detail="Repository not found")
 
-    # p.scan(db)
-    background_tasks.add_task(repo.scan, db)
+    scan_task.delay(repository.url)
     return {"message": "Scan queued visit the status on /status"}
 
 
