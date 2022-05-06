@@ -18,6 +18,8 @@ SQLAlchemy = "^1.4.35"
 requests = "^2.27.1"
 GitPython = "^3.1.27"
 aiosqlite = "^0.17.0"
+celery = "^5.2.6"
+redis = "^4.2.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

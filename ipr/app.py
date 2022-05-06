@@ -9,8 +9,8 @@ from starlette.status import HTTP_201_CREATED, HTTP_202_ACCEPTED
 
 from .config import settings
 from .database import SessionLocal, engine
-from .models import Base, Project
-from .schemas import ProjectBase
+from .models import AuditLog, Base, Project
+from .schemas import RepoBase
 
 Base.metadata.create_all(bind=engine)
 
@@ -55,51 +55,55 @@ async def root(request: Request):
     return url_list
 
 
-@app.get("/projects")
-def list_all_projects(db: Session = Depends(get_db)):
-    projects = db.query(Project).all()
-    return projects
+@app.get("/repositories")
+def list_all_repositories(db: Session = Depends(get_db)):
+    repos = Project.all(db)
+    for r in repos:
+        r.status = AuditLog.last_status(r.url, db)
+    return repos
 
 
-@app.post("/project", status_code=HTTP_201_CREATED)
-def create_or_update_a_new_project(project: ProjectBase, db: Session = Depends(get_db)):
+@app.post("/repository", status_code=HTTP_201_CREATED)
+def create_or_update_a_new_repository(
+    repository: RepoBase, db: Session = Depends(get_db)
+):
     """
-    ## Creates a new project
-    If the project is already existing, it will be updated.
+    ## Creates a new repository
+    If the repo is already existing, it will be updated.
     """
-    p = Project(url=project.url)
-    p.save(db)
-    return p
+    repo = Project(url=repository.url)
+    repo.save(db)
+    return repo
 
 
 @app.post("/scan", status_code=HTTP_202_ACCEPTED)
 async def scan(
-    project: ProjectBase,
+    repository: RepoBase,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     """
     ## Queue a scan of the project into a background task.
     """
-    p = Project.by_url(project.url, db)
-    if not p:
-        raise HTTPException(status_code=404, detail="Project not found")
+    repo = Project.by_url(repository.url, db)
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repository not found")
 
     # p.scan(db)
-    background_tasks.add_task(p.scan, db)
-    return {"message": "Scan queued visti the status on /status"}
+    background_tasks.add_task(repo.scan, db)
+    return {"message": "Scan queued visit the status on /status"}
 
 
 @app.post("/status")
-def status(project: ProjectBase, db: Session = Depends(get_db)):
+def status(repository: RepoBase, db: Session = Depends(get_db)):
     """
     ## Returns the status of the project.
     """
-    p = Project.by_url(project.url, db)
-    if not p:
-        raise HTTPException(status_code=404, detail="Project not found")
+    repo = Project.by_url(repository.url, db)
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repository not found")
 
-    return p.logs(db)
+    return repo.logs(db)
 
 
 def start():

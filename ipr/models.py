@@ -9,7 +9,7 @@ import requests
 from reuse import lint
 from reuse.project import Project as ReuseProject
 from scancode.cli import run_scan
-from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String, desc
 from sqlalchemy.orm import Session
 
 from .config import settings
@@ -136,7 +136,7 @@ class Project(Base):
 
     @classmethod
     def all(cls, db: Session):
-        return db.query(cls).all()
+        return db.query(cls).order_by(desc(cls.date_created)).all()
 
     @classmethod
     def all_by(
@@ -166,3 +166,20 @@ class AuditLog(Base):
     @classmethod
     def by_url(cls, url, db: Session):
         return db.query(cls).filter(url == url).all()
+
+    @classmethod
+    def last_status(cls, url, db: Session):
+        start = (
+            db.query(cls)
+            .filter(cls.url == url)
+            .filter(cls.state == State.CLONE_START)
+            .order_by(desc(cls.date_created))
+            .first()
+        )
+        return (
+            db.query(cls)
+            .filter(cls.url == url)
+            .filter(cls.date_created >= start.date_created)
+            .order_by(desc(cls.state))
+            .all()
+        )
