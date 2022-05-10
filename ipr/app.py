@@ -14,17 +14,14 @@ from .database import SessionLocal, engine
 from .models import AuditLog, Base, Project
 from .schemas import RepoBase
 
-# import billiard as multiprocessing
-
-
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine, checkfirst=True)
 
 celery = Celery(
     __name__, broker=settings.CELERY_BROKER, backend=settings.CELERY_BACKEND
 )
 celery_log = get_task_logger(__name__)
 
-app = FastAPI()
+app = FastAPI(title="IPR")
 L = logging.getLogger("uvicorn.error")
 
 app.add_middleware(
@@ -80,19 +77,18 @@ def create_or_update_a_new_repository(
     ## Creates a new repository
     If the repo is already existing, it will be updated.
     """
-    repo = Project(url=repository.url)
-    repo.save(db)
+    repo = Project.by_url(url=repository.url, db=db)
+    if not repo:
+        repo = Project(url=repository.url)
+        repo.save(db)
     return repo
 
 
 @celery.task
 def scan_task(url):
-    celery_log.info(f"{url} START scan")
-    db = SessionLocal()
+    db = next(get_db())
     repo = Project.by_url(url, db)
-    print(repo)
     repo.scan(db)
-    celery_log.info(f"{url} END scan")
 
 
 @app.post("/scan", status_code=HTTP_202_ACCEPTED)
