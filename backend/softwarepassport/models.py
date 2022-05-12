@@ -56,11 +56,13 @@ class Project(Base):
         self.__log(db, State.CLONE_START)
         repo = git.Repo.clone_from(self.url, self.path, depth=1)
         self.__log(db, State.CLONE_END)
-        self.hash = repo.head.object.hexsha
-        existing = Project.by_hash(self.url, self.hash, db)
-        if existing:
-            return existing
+        h = repo.head.object.hexsha
+        existing = Project.by_url(self.url, db)
+        if existing and existing.hash == h:
+            return True
+        self.hash = h
         self.save(db=db)
+        return False
 
     def reuse(self, db: Session):
         L.info("Running reuse for %s", self.url)
@@ -151,7 +153,7 @@ class Project(Base):
 
     def __log(self, db: Session, state: State, output: str = None):
         al = AuditLog(url=self.url, state=state, output=output)
-        db.add(al)
+        db.merge(al)
         db.flush()
 
     def logs(self, db: Session):

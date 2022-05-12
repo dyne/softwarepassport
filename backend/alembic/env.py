@@ -4,9 +4,9 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from ipr.app import app
-from ipr.config import settings
-from ipr.database import Base
+from softwarepassport.app import app
+from softwarepassport.config import settings
+from softwarepassport.database import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

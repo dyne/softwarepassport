@@ -1,6 +1,6 @@
 <h1 align="center">
-  IPR</br>
-  <sub>Reuse compliance checker and license scanning for IPR management</sub>
+  Software Passport</br>
+  <sub>Reuse compliance checker and license scanning for Software Passport management</sub>
 </h1>
 
 <p align="center">
@@ -36,9 +36,9 @@
 </h4>
 
 
-IPR is the backend service that powers by [Licensechain](https://github.com/dyne/licensechain) a service that allows to scan git repositories and check compliancy for [Reuse Tool](https://reuse.software).
+Software Passport is the backend service that powers by [Licensechain](https://github.com/dyne/licensechain) a service that allows to scan git repositories and check compliancy for [Reuse Tool](https://reuse.software).
 
-The IPR backend is an a 
+The Software Passport backend is an a
 
 Abstract description like: 🚧 Zenroom is a software in **ALPHA stage** and are part of the [DECODE project](https://decodeproject.eu) about data-ownership and [technological sovereignty](https://www.youtube.com/watch?v=RvBRbwBm_nQ). Our effort is that of improving people's awareness of how their data is processed by algorithms, as well facilitate the work of developers to create along [privacy by design principles](https://decodeproject.eu/publications/privacy-design-strategies-decode-architecture) using algorithms that can be deployed in any situation without any change.
 
@@ -61,7 +61,7 @@ Abstract description like: 🚧 Zenroom is a software in **ALPHA stage** and are
 
 ## 🎮 Quick start
 
-To start using IPR just (fill with real documentation)
+To start using Software Passport just (fill with real documentation)
 
 ***
 ## 💾 Install
@@ -147,7 +147,7 @@ Please first take a look at the [Dyne.org - Contributor License Agreement](CONTR
 
 ***
 ## 💼 License
-    IPR - Reuse compliance checker and license scanning for IPR management
+    Software Passport - Reuse compliance checker and license scanning for Software Passport management
     Copyleft (ɔ) 2021 Dyne.org foundation, Amsterdam
 
     This program is free software: you can redistribute it and/or modify

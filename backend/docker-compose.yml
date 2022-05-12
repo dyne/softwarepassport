@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  web:
+  api:
     build: ./
     ports:
       - 8004:8000
@@ -14,8 +14,8 @@ services:
       - POSTGRES_USER=monkey_user
       - POSTGRES_PASSWORD=monkey_pass
       - POSTGRES_DB=monkey_db
-      - POSTGRES_SERVER=pgbouncer
-      - POSTGRES_PORT=6432
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=5432
     depends_on:
       - pgbouncer
     sysctls:
@@ -23,7 +23,7 @@ services:
 
   worker:
     build: ./
-    command: poetry run celery -A ipr.app.celery worker -P threads -E --concurrency=30 --loglevel=info
+    command: poetry run celery -A softwarepassport.app.celery worker -P threads -E --concurrency=30 --loglevel=info
     volumes:
       - ./:/usr/src/app
     environment:
@@ -32,12 +32,12 @@ services:
       - POSTGRES_USER=monkey_user
       - POSTGRES_PASSWORD=monkey_pass
       - POSTGRES_DB=monkey_db
-      - POSTGRES_SERVER=pgbouncer
-      - POSTGRES_PORT=6432
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=5432
     sysctls:
       - net.ipv4.tcp_keepalive_time=200
     depends_on:
-      - web
+      - api
       - redis
 
   redis:
@@ -45,7 +45,7 @@ services:
 
   dashboard:
     build: ./
-    command: poetry run celery -A ipr.app.celery flower
+    command: poetry run celery -A softwarepassport.app.celery flower
     volumes:
       - ./:/usr/src/app
     ports:
@@ -56,11 +56,11 @@ services:
       - POSTGRES_USER=monkey_user
       - POSTGRES_PASSWORD=monkey_pass
       - POSTGRES_DB=monkey_db
-      - POSTGRES_SERVER=pgbouncer
-      - POSTGRES_PORT=6432
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=5432
     depends_on:
       - redis
-      - web
+      - api
       - worker
       - pgbouncer
 

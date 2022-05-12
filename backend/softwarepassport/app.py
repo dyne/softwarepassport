@@ -21,7 +21,7 @@ celery = Celery(
 )
 celery_log = get_task_logger(__name__)
 
-app = FastAPI(title="IPR")
+app = FastAPI(title="Software Passport API")
 L = logging.getLogger("uvicorn.error")
 
 app.add_middleware(
@@ -121,7 +121,7 @@ def status(repository: RepoBase, db: Session = Depends(get_db)):
 
 def start():
     uvicorn.run(
-        "ipr.app:app",
+        "softwarepassport.app:app",
         host=str(settings.HOST),
         port=settings.PORT,
         reload=True,

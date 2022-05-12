@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "ipr"
+name = "softwarepassport"
 version = "0.1.0"
 description = ""
 authors = ["Puria Nafisi Azizi <puria@dyne.org>"]
 
 [tool.poetry.scripts]
-start = "ipr.app:start"
+start = "softwarepassport.app:start"
 
 [tool.poetry.dependencies]
 python = "^3.9"

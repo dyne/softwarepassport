@@ -4,8 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from ipr.app import app, get_db
-from ipr.database import Base
+from softwarepassport.app import app, get_db
+from softwarepassport.database import Base
 
 
 engine = create_engine(
