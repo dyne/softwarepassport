@@ -10,13 +10,27 @@ import SawroomModal from '../components/SawroomModal'
 
 dayjs.extend(relativeTime)
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+interface Repository {
+  url: string;
+  hash: string;
+  date_last_updated: string;
+  date_created: string;
+  reuse_compliant: boolean;
+  fabric_tag: string;
+  sawroom_tag: string;
+  status: {
+    state: number;
+  }[]
+}
+
 const Home: NextPage = () => {
-  const { data, error } = useSwr(`http://127.0.0.1:8000/repositories`)
+  const { data, error } = useSwr(`${API_URL}/repositories`)
   const [repo, addRepo] = useState("")
 
   const onAddRepo = async () => {
-    const create = 'http://127.0.0.1:8000/repository'
-    const scan = 'http://127.0.0.1:8000/scan'
+    const create = `${API_URL}/repository`
+    const scan = `${API_URL}/scan`
     const options = {
       headers: {
         'Accept': 'application/json',
@@ -41,7 +55,7 @@ const Home: NextPage = () => {
           </h2>
           <div className="flex mt-8 lg:mt-0 lg:flex-shrink-0">
             <div className="inline-flex rounded-md">
-              <input type="url" placeholder="git repository" className="input input-bordered" onChange={e => {
+              <input type="url" placeholder="git repository" className="w-full input input-bordered" onChange={e => {
                 addRepo(e.target.value)
               }} />
             </div>
@@ -53,7 +67,7 @@ const Home: NextPage = () => {
         </div>
       </div>
       <div className="w-full pt-10 mt-10 overflow-x-auto">
-        <table className="table w-full">
+        <table className="table min-w-full text-center">
           <thead>
             <tr>
               <th>Repo</th>
@@ -64,7 +78,7 @@ const Home: NextPage = () => {
             </tr>
           </thead>
           <tbody>
-            {data?.map((repository) => (
+            {data?.map((repository: Repository) => (
               <tr key={repository.url}>
                 <td>
                   <div className="flex items-center space-x-3">
@@ -91,10 +105,10 @@ const Home: NextPage = () => {
           </tbody>
           <tfoot>
             <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Job</th>
-              <th>Favorite Color</th>
+              <th>Repo</th>
+              <th>Status</th>
+              <th>REUSE compliant</th>
+              <th>Blockchain</th>
               <th></th>
             </tr>
           </tfoot>

@@ -1,6 +1,10 @@
-const StatusBar = ({ status }) => {
+interface Status {
+  state: number;
+}
+
+const StatusBar = ({ status }: { status: Status[] }) => {
   const all_states = status.map(s => s.state);
-  const steps = {
+  const steps: { [key: string]: any } = {
     "clone": { start: 1, end: 2 },
     "reuse": { start: 3, end: 4 },
     "notarize": { start: 5, end: 6 },

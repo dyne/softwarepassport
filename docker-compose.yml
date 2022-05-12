@@ -1,0 +1,31 @@
+services:
+  api:
+    extends:
+      file: backend/docker-compose.yml
+      service: api
+  worker:
+    extends:
+      file: backend/docker-compose.yml
+      service: worker
+  redis:
+    extends:
+      file: backend/docker-compose.yml
+      service: redis
+  flower:
+    extends:
+      file: backend/docker-compose.yml
+      service: dashboard
+  pgbouncer:
+    extends:
+      file: backend/docker-compose.yml
+      service: pgbouncer
+  db:
+    extends:
+      file: backend/docker-compose.yml
+      service: db
+  frontend:
+    extends:
+      file: frontend/docker-compose.yml
+      service: frontend
+volumes:
+  postgres_data:
