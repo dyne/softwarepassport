@@ -5,6 +5,7 @@ from datetime import datetime
 from io import StringIO
 
 import git
+import json
 import requests
 from reuse import lint
 from reuse.project import Project as ReuseProject
@@ -87,7 +88,7 @@ class Project(Base):
     def scancode(self, db: Session):
         L.info("Running scancode for %s", self.url)
         self.__log(db, State.SCANCODE_START)
-        self.scancode_report = str(
+        self.scancode_report = json.dumps(
             run_scan(
                 self.path,
                 license=True,
@@ -115,9 +116,13 @@ class Project(Base):
         )
         self.__log(db, State.BLOCKCHAIN_START)
         for (url, param, tag) in blockchains:
+          try:
             r = requests.post(url, json=data)
             setattr(self, tag, r.json()[param])
             L.debug("Blockchain response to %s: %s", url, r.json())
+          except Exception as e:
+            L.exception("Failed to post to blockchain", e)
+            continue
         self.__log(db, State.BLOCKCHAIN_END)
 
     def scan(self, db: Session):

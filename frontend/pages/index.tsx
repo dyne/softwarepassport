@@ -6,6 +6,7 @@ import useSwr from 'swr'
 import { useState } from 'react'
 import StatusBar from '../components/StatusBar'
 import VerificationButton from '../components/VerificationButton'
+import CopyrightHolders from '../components/CopyrightHolders'
 
 dayjs.extend(relativeTime)
 
@@ -16,6 +17,8 @@ interface Repository {
   date_last_updated: string;
   date_created: string;
   reuse_compliant: boolean;
+  scancode_report: string;
+  reuse_report: string;
   fabric_tag: string;
   sawroom_tag: string;
   ethereum_tag: string;
@@ -93,13 +96,28 @@ const Home: NextPage = () => {
                   <StatusBar status={repository.status} />
                 </td>
                 <td>{repository.reuse_compliant ? "✅" : "🚫"}</td>
-                <td className="flex flex-col">
+                <td className="flex flex-col space-y-2">
                   <VerificationButton transactionId={repository.fabric_tag} label="fabric" verificationUrl="https://apiroom.net/api/zenbridge/fabric-read" verificationParam="myFabricTag" />
                   <VerificationButton transactionId={repository.sawroom_tag} label="sawroom" verificationUrl="https://apiroom.net/api/zenbridge/sawroom-read" verificationParam="mySawroomTag" />
                   <VerificationButton transactionId={repository.ethereum_tag} label="ethereum" verificationUrl="https://apiroom.net/api/zenbridge/ethereum-read" verificationParam="txid" />
                 </td>
                 <td>
-                  <button className="btn btn-xs">re-scan</button>
+                  <div className="flex flex-col space-y-2">
+                    {
+                      repository.scancode_report && <>
+                        <label htmlFor={repository.hash} className="btn btn-xs modal-button">scancode result</label>
+
+                        <input type="checkbox" id={repository.hash} className="modal-toggle" />
+                        <label htmlFor={repository.hash} className="cursor-pointer modal">
+                          <label className="relative min-w-fit modal-box" htmlFor="">
+                            <CopyrightHolders holders={JSON.parse(repository.scancode_report)?.consolidated_components} />
+                          </label>
+                        </label>
+                      </>
+                    }
+
+                    <button className="btn btn-xs">re-scan</button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -110,12 +128,12 @@ const Home: NextPage = () => {
               <th>Status</th>
               <th>REUSE compliant</th>
               <th>Blockchain</th>
-              <th></th>
+              <th>actions</th>
             </tr>
           </tfoot>
         </table>
       </div>
-    </section>
+    </section >
   )
 }
 

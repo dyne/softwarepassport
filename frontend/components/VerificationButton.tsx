@@ -29,11 +29,11 @@ const VerificationButton = ({ transactionId, label, verificationUrl, verificatio
   return <>
     {transactionId &&
       <>
-        <label htmlFor={transactionId} className="btn btn-xs modal-button m-1">{label}</label>
+        <label htmlFor={transactionId} className="btn btn-xs modal-button">{label}</label>
 
         <input type="checkbox" id={transactionId} className="modal-toggle" />
         <div className="modal">
-          <div className="relative modal-box text-left min-w-fit">
+          <div className="relative text-left modal-box min-w-fit">
             <label htmlFor={transactionId} className="absolute btn btn-sm btn-circle right-2 top-2">✕</label>
             <h3 className="text-lg font-bold">Congratulations this is notarized on {label}!</h3>
             <pre className="py-4">{JSON.stringify(data, null, 2)}</pre>
