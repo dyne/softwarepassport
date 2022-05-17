@@ -31,19 +31,26 @@ const Home: NextPage = () => {
   const { data, error } = useSwr(`${API_URL}/repositories`)
   const [repo, addRepo] = useState("")
 
+  const options = {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: "POST",
+    body: JSON.stringify({
+      url: repo
+    })
+  }
+
+  const create = `${API_URL}/repository`
+  const scan = `${API_URL}/scan`
+
+  const onRescanRepo = async (url: string) => {
+    addRepo(url);
+    await fetch(scan, options);
+  }
+
   const onAddRepo = async () => {
-    const create = `${API_URL}/repository`
-    const scan = `${API_URL}/scan`
-    const options = {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      method: "POST",
-      body: JSON.stringify({
-        url: repo
-      })
-    }
     await fetch(create, options);
     await fetch(scan, options);
   }
@@ -116,7 +123,10 @@ const Home: NextPage = () => {
                       </>
                     }
 
-                    <button className="btn btn-xs">re-scan</button>
+                    <button className="btn btn-xs" onClick={(e) => {
+                      e.preventDefault();
+                      onRescanRepo(repository.url);
+                    }}>re-scan</button>
                   </div>
                 </td>
               </tr>

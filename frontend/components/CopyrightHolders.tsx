@@ -5,7 +5,7 @@ interface Holder {
 }
 const CopyrightHolders = ({ holders }: { holders: Holder[] }) => {
   return (
-    <div className="grid grid-cols-4 gap-8">
+    <div className="grid grid-cols-3 gap-8">
       {holders.map((holder: Holder) => {
         return (
           <div className="shadow-xl card w-96 bg-base-100">
