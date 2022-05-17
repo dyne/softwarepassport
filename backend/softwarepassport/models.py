@@ -41,6 +41,7 @@ class Project(Base):
     scancode_report = Column(String, default=None)
     sawroom_tag = Column(String, index=True, default=None)
     fabric_tag = Column(String, index=True, default=None)
+    ethereum_tag = Column(String, index=True, default=None)
     date_created = Column(DateTime, default=datetime.utcnow)
     date_last_updated = Column(DateTime, default=datetime.utcnow)
     description = Column(String, index=True, default=None)
@@ -103,6 +104,7 @@ class Project(Base):
         blockchains = [
             (settings.SAWROOM, "mySawroomTag", "sawroom_tag"),
             (settings.FABRIC, "myFabricTag", "fabric_tag"),
+            (settings.ETHEREUM, "txid", "ethereum_tag"),
         ]
         data = dict(
             data=dict(

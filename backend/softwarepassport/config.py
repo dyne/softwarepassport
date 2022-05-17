@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     WORKERS: int = 14
     SAWROOM: HttpUrl = "https://apiroom.net/api/zenbridge/sawroom-write"
     FABRIC: HttpUrl = "https://apiroom.net/api/zenbridge/fabric-write"
+    ETHEREUM: HttpUrl = "https://apiroom.net/api/zenbridge/ethereum-write"
     PAGINATION_WINDOW: int = 100
     CELERY_BROKER: RedisDsn = "redis://127.0.0.1:6379/0"
     CELERY_BACKEND: RedisDsn = "redis://127.0.0.1:6379/0"

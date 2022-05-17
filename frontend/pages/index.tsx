@@ -5,8 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import useSwr from 'swr'
 import { useState } from 'react'
 import StatusBar from '../components/StatusBar'
-import FabricModal from '../components/FabricModal'
-import SawroomModal from '../components/SawroomModal'
+import VerificationButton from '../components/VerificationButton'
 
 dayjs.extend(relativeTime)
 
@@ -19,6 +18,7 @@ interface Repository {
   reuse_compliant: boolean;
   fabric_tag: string;
   sawroom_tag: string;
+  ethereum_tag: string;
   status: {
     state: number;
   }[]
@@ -93,9 +93,10 @@ const Home: NextPage = () => {
                   <StatusBar status={repository.status} />
                 </td>
                 <td>{repository.reuse_compliant ? "✅" : "🚫"}</td>
-                <td>
-                  <FabricModal fabric_tag={repository.fabric_tag} />
-                  <SawroomModal sawroom_tag={repository.sawroom_tag} />
+                <td className="flex flex-col">
+                  <VerificationButton transactionId={repository.fabric_tag} label="fabric" verificationUrl="https://apiroom.net/api/zenbridge/fabric-read" verificationParam="myFabricTag" />
+                  <VerificationButton transactionId={repository.sawroom_tag} label="sawroom" verificationUrl="https://apiroom.net/api/zenbridge/sawroom-read" verificationParam="mySawroomTag" />
+                  <VerificationButton transactionId={repository.ethereum_tag} label="ethereum" verificationUrl="https://apiroom.net/api/zenbridge/ethereum-read" verificationParam="txid" />
                 </td>
                 <td>
                   <button className="btn btn-xs">re-scan</button>
