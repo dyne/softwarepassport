@@ -120,13 +120,13 @@ const Home: NextPage = () => {
                             <CopyrightHolders holders={JSON.parse(repository.scancode_report)?.consolidated_components} />
                           </label>
                         </label>
+
+                        <button className="btn btn-xs" onClick={(e) => {
+                          e.preventDefault();
+                          onRescanRepo(repository.url);
+                        }}>re-scan</button>
                       </>
                     }
-
-                    <button className="btn btn-xs" onClick={(e) => {
-                      e.preventDefault();
-                      onRescanRepo(repository.url);
-                    }}>re-scan</button>
                   </div>
                 </td>
               </tr>

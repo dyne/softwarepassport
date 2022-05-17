@@ -24,7 +24,8 @@ const VerificationButton = ({ transactionId, label, verificationUrl, verificatio
 
   useEffect(() => {
     fetch(verificationUrl, options).then(r => r.json().then(r => { setData(r) }));
-  }, [])
+  }, [verificationUrl, options, transactionId]);
+
 
   return <>
     {transactionId &&
