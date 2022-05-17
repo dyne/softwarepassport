@@ -1,6 +1,7 @@
 import logging
 
 import uvicorn
+import git
 from celery import Celery
 from celery.utils.log import get_task_logger
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -79,7 +80,15 @@ def create_or_update_a_new_repository(
     repo = Project.by_url(url=repository.url, db=db)
     if not repo:
         repo = Project(url=repository.url)
-        repo.save(db)
+        try:
+            repo.clone(db)
+            repo.save(db)
+        except git.exc.GitCommandError as e:
+            L.exception(e)
+            raise HTTPException(
+                status_code=424,
+                detail=f"Oops {repository.url} is not a valid git repository",
+            )
     return repo
 
 

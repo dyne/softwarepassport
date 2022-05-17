@@ -129,12 +129,12 @@ class Project(Base):
         L.debug("Scanning project %s", self.url)
         existing = self.clone(db)
         if existing:
-            self.__log(db, State.REUSE_START)
-            self.__log(db, State.REUSE_END)
-            self.__log(db, State.BLOCKCHAIN_START)
-            self.__log(db, State.BLOCKCHAIN_END)
-            self.__log(db, State.SCANCODE_START)
-            self.__log(db, State.SCANCODE_END)
+            if not self.reuse_report:
+                self.reuse(db)
+            if None in [self.sawroom_tag, self.fabric_tag, self.ethereum_tag]:
+                self.blockchain(db)
+            if not self.scancode_report:
+                self.scancode(db)
             return
         self.reuse(db)
         self.blockchain(db)
