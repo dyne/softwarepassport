@@ -46,8 +46,17 @@ const Home: NextPage = () => {
   const create = `${API_URL}/repository`
   const scan = `${API_URL}/scan`
 
-  const onRescanRepo = async (url: string) => {
-    addRepo(url);
+  const onRescanRepo = async (repoURl: string) => {
+    const options = {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify({
+        url: repoURl
+      })
+    }
     await fetch(scan, options);
   }
 
@@ -84,7 +93,7 @@ const Home: NextPage = () => {
       {alert &&
         <div className="m-2 shadow-lg alert alert-warning">
           <div>
-            <svg xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             <span>{alert}</span>
           </div>
         </div>
@@ -135,8 +144,8 @@ const Home: NextPage = () => {
                         </label>
 
                         <button className="btn btn-xs" onClick={(e) => {
-                          e.preventDefault();
                           onRescanRepo(repository.url);
+                          e.preventDefault();
                         }}>re-scan</button>
                       </>
                     }

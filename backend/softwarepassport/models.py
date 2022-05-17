@@ -116,13 +116,13 @@ class Project(Base):
         )
         self.__log(db, State.BLOCKCHAIN_START)
         for (url, param, tag) in blockchains:
-          try:
-            r = requests.post(url, json=data)
-            setattr(self, tag, r.json()[param])
-            L.debug("Blockchain response to %s: %s", url, r.json())
-          except Exception as e:
-            L.exception("Failed to post to blockchain", e)
-            continue
+            try:
+                r = requests.post(url, json=data)
+                setattr(self, tag, r.json()[param])
+                L.debug("Blockchain response to %s: %s", url, r.json())
+            except Exception as e:
+                L.exception("Failed to post to blockchain", e)
+                continue
         self.__log(db, State.BLOCKCHAIN_END)
 
     def scan(self, db: Session):
@@ -131,14 +131,24 @@ class Project(Base):
         if existing:
             if not self.reuse_report:
                 self.reuse(db)
+            else:
+                self.__log(db, State.REUSE_START)
+                self.__log(db, State.REUSE_END)
             if None in [self.sawroom_tag, self.fabric_tag, self.ethereum_tag]:
                 self.blockchain(db)
+            else:
+                self.__log(db, State.BLOCKCHAIN_START)
+                self.__log(db, State.BLOCKCHAIN_END)
             if not self.scancode_report:
                 self.scancode(db)
-            return
-        self.reuse(db)
-        self.blockchain(db)
-        self.scancode(db)
+            else:
+                self.__log(db, State.SCANCODE_START)
+                self.__log(db, State.SCANCODE_END)
+        else:
+            self.reuse(db)
+            self.blockchain(db)
+            self.scancode(db)
+
         self.save(db)
 
     def save(self, db: Session):
@@ -167,7 +177,7 @@ class Project(Base):
     def __log(self, db: Session, state: State, output: str = None):
         latest = AuditLog.latest(self.url, db)
         if latest and latest.state is state:
-          return
+            return
         al = AuditLog(url=self.url, state=state, output=output)
         db.merge(al)
         db.flush()
@@ -190,16 +200,23 @@ class AuditLog(Base):
         return db.query(cls).filter(url == url).all()
 
     @classmethod
-    def latest(cls, url, db:Session):
-      return db.query(cls).filter(cls.url == url).order_by(desc(cls.date_created)).first()
+    def latest(cls, url, db: Session):
+        return (
+            db.query(cls)
+            .filter(cls.url == url)
+            .order_by(desc(cls.date_created))
+            .first()
+        )
 
     @classmethod
-    def latest_run_start(cls, url, db:Session):
-      return db.query(cls)\
-        .filter(cls.url == url)\
-        .filter(cls.state == State.CLONE_START)\
-        .order_by(desc(cls.date_created))\
-        .first()
+    def latest_run_start(cls, url, db: Session):
+        return (
+            db.query(cls)
+            .filter(cls.url == url)
+            .filter(cls.state == State.CLONE_START)
+            .order_by(desc(cls.date_created))
+            .first()
+        )
 
     @classmethod
     def last_status(cls, url, db: Session):
