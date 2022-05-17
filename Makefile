@@ -14,7 +14,7 @@ run: ## 🚀 Run all the components quickly
 
 logs: ## 📋 Show the logs of the containers
 	@echo "📋 Showing the logs of the containers"
-	docker-compose logs -f
+	docker compose logs -f
 
 down: halt
 stop: halt
@@ -24,6 +24,6 @@ halt: ## 💔 Stop all the components
 
 clean: ## 🗑 clean the containers
 	@echo "🗑 Cleaning the Docker containers"
-	docker-compose down -v --rmi all --remove-orphans
+	docker compose down -v --rmi all --remove-orphans
 
 
