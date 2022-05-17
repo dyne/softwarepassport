@@ -10,7 +10,7 @@ from pydantic import (
 
 
 class Settings(BaseSettings):
-    CORS_ORIGINS: str = "http://localhost:8000,http://localhost:3000"
+    CORS_ORIGINS: str = "http://softwarepassport.dyne.org:3000"
     POSTGRES_SERVER: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str

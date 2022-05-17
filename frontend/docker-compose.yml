@@ -12,4 +12,4 @@ services:
       - /usr/src/app/node_modules
       - /usr/src/app/.next
     environment:
-      - NEXT_PUBLIC_API_URL=http://127.0.0.1:8004
+      - NEXT_PUBLIC_API_URL=http://softwarepassport.dyne.org:8004
