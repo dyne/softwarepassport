@@ -26,10 +26,10 @@ class State(enum.Enum):
     CLONE_END = 2
     REUSE_START = 3
     REUSE_END = 4
-    SCANCODE_START = 7
-    SCANCODE_END = 8
     BLOCKCHAIN_START = 5
     BLOCKCHAIN_END = 6
+    SCANCODE_START = 7
+    SCANCODE_END = 8
 
 
 class Project(Base):
@@ -129,6 +129,12 @@ class Project(Base):
         L.debug("Scanning project %s", self.url)
         existing = self.clone(db)
         if existing:
+            self.__log(db, State.REUSE_START)
+            self.__log(db, State.REUSE_END)
+            self.__log(db, State.BLOCKCHAIN_START)
+            self.__log(db, State.BLOCKCHAIN_END)
+            self.__log(db, State.SCANCODE_START)
+            self.__log(db, State.SCANCODE_END)
             return
         self.reuse(db)
         self.blockchain(db)
@@ -159,6 +165,9 @@ class Project(Base):
         return db.query(cls).offset(skip).limit(limit).all()
 
     def __log(self, db: Session, state: State, output: str = None):
+        latest = AuditLog.latest(self.url, db)
+        if latest and latest.state is state:
+          return
         al = AuditLog(url=self.url, state=state, output=output)
         db.merge(al)
         db.flush()
@@ -181,14 +190,20 @@ class AuditLog(Base):
         return db.query(cls).filter(url == url).all()
 
     @classmethod
+    def latest(cls, url, db:Session):
+      return db.query(cls).filter(cls.url == url).order_by(desc(cls.date_created)).first()
+
+    @classmethod
+    def latest_run_start(cls, url, db:Session):
+      return db.query(cls)\
+        .filter(cls.url == url)\
+        .filter(cls.state == State.CLONE_START)\
+        .order_by(desc(cls.date_created))\
+        .first()
+
+    @classmethod
     def last_status(cls, url, db: Session):
-        start = (
-            db.query(cls)
-            .filter(cls.url == url)
-            .filter(cls.state == State.CLONE_START)
-            .order_by(desc(cls.date_created))
-            .first()
-        )
+        start = cls.latest_run_start(url, db)
         return (
             db.query(cls)
             .filter(cls.url == url)
