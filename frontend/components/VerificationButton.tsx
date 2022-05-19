@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 interface VProps {
   transactionId: string;
@@ -7,7 +7,7 @@ interface VProps {
   verificationParam: string;
 }
 
-const VerificationButton = ({ transactionId, label, verificationUrl, verificationParam }: VProps) => {
+const VerificationButton = ({transactionId, label, verificationUrl, verificationParam}: VProps) => {
   const [data, setData] = useState({});
   const options = {
     method: "POST",
@@ -24,8 +24,8 @@ const VerificationButton = ({ transactionId, label, verificationUrl, verificatio
 
   useEffect(() => {
     try {
-      fetch(verificationUrl, options).then(r => r.json().then(r => { setData(r) }));
-    } catch (e) { }
+      fetch(verificationUrl, options).then(r => r.json().then(r => {setData(r)}));
+    } catch (e) {}
   }, [transactionId]);
 
 
@@ -36,10 +36,10 @@ const VerificationButton = ({ transactionId, label, verificationUrl, verificatio
 
         <input type="checkbox" id={transactionId} className="modal-toggle" />
         <div className="modal">
-          <div className="relative text-left modal-box min-w-fit">
+          <div className="relative text-left modal-box max-w-full min-w-fit">
             <label htmlFor={transactionId} className="absolute btn btn-sm btn-circle right-2 top-2">✕</label>
             <h3 className="text-lg font-bold">Congratulations this is notarized on {label}!</h3>
-            <pre className="py-4">{JSON.stringify(data, null, 2)}</pre>
+            <pre className="py-4 break-all whitespace-normal max-w-full">{JSON.stringify(data, null, 2)}</pre>
           </div>
         </div>
       </>}
