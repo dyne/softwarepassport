@@ -10,7 +10,7 @@ from pydantic import (
 
 
 class Settings(BaseSettings):
-    CORS_ORIGINS: str = "http://softwarepassport.dyne.org:3000"
+    CORS_ORIGINS: str = "http://localhost:3000,http://softwarepassport.dyne.org:3000"
     POSTGRES_SERVER: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     SAWROOM: HttpUrl = "https://apiroom.net/api/zenbridge/sawroom-write"
     FABRIC: HttpUrl = "https://apiroom.net/api/zenbridge/fabric-write"
     ETHEREUM: HttpUrl = "https://apiroom.net/api/zenbridge/ethereum-write"
+    PLANETMINT: HttpUrl = "https://apiroom.net/api/zenbridge/planetmint-write"
     PAGINATION_WINDOW: int = 100
     CELERY_BROKER: RedisDsn = "redis://127.0.0.1:6379/0"
     CELERY_BACKEND: RedisDsn = "redis://127.0.0.1:6379/0"

@@ -43,6 +43,7 @@ class Project(Base):
     sawroom_tag = Column(String, index=True, default=None)
     fabric_tag = Column(String, index=True, default=None)
     ethereum_tag = Column(String, index=True, default=None)
+    planetmint_tag = Column(String, index=True, default=None)
     date_created = Column(DateTime, default=datetime.utcnow)
     date_last_updated = Column(DateTime, default=datetime.utcnow)
     description = Column(String, index=True, default=None)
@@ -106,6 +107,7 @@ class Project(Base):
             (settings.SAWROOM, "mySawroomTag", "sawroom_tag"),
             (settings.FABRIC, "myFabricTag", "fabric_tag"),
             (settings.ETHEREUM, "txid", "ethereum_tag"),
+            (settings.PLANETMINT, "txid", "planetmint_tag"),
         ]
         data = dict(
             data=dict(
@@ -134,7 +136,7 @@ class Project(Base):
             else:
                 self.__log(db, State.REUSE_START)
                 self.__log(db, State.REUSE_END)
-            if None in [self.sawroom_tag, self.fabric_tag, self.ethereum_tag]:
+            if None in [self.sawroom_tag, self.fabric_tag, self.ethereum_tag, self.planetmint_tag]:
                 self.blockchain(db)
             else:
                 self.__log(db, State.BLOCKCHAIN_START)

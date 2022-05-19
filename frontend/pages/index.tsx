@@ -22,6 +22,7 @@ interface Repository {
   fabric_tag: string;
   sawroom_tag: string;
   ethereum_tag: string;
+  planetmint_tag: string;
   status: {
     state: number;
   }[]
@@ -129,6 +130,7 @@ const Home: NextPage = () => {
                   <VerificationButton transactionId={repository.fabric_tag} label="fabric" verificationUrl="https://apiroom.net/api/zenbridge/fabric-read" verificationParam="myFabricTag" />
                   <VerificationButton transactionId={repository.sawroom_tag} label="sawroom" verificationUrl="https://apiroom.net/api/zenbridge/sawroom-read" verificationParam="mySawroomTag" />
                   <VerificationButton transactionId={repository.ethereum_tag} label="ethereum" verificationUrl="https://apiroom.net/api/zenbridge/ethereum-retrieve" verificationParam="txid" />
+                  <VerificationButton transactionId={repository.planetmint_tag} label="planetmint" verificationUrl="https://apiroom.net/api/zenbridge/planetmint-read" verificationParam="txid" />
                 </td>
                 <td>
                   <div className="flex flex-col space-y-2">
