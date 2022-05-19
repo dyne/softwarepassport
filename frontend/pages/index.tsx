@@ -1,9 +1,9 @@
-import type { NextPage } from 'next'
+import type {NextPage} from 'next'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import useSwr from 'swr'
-import { useState } from 'react'
+import {useState} from 'react'
 import StatusBar from '../components/StatusBar'
 import VerificationButton from '../components/VerificationButton'
 import CopyrightHolders from '../components/CopyrightHolders'
@@ -28,7 +28,7 @@ interface Repository {
 }
 
 const Home: NextPage = () => {
-  const { data, error } = useSwr(`${API_URL}/repositories`)
+  const {data, error} = useSwr(`${API_URL}/repositories`)
   const [repo, addRepo] = useState("")
   const [alert, setAlert] = useState("")
 
@@ -128,7 +128,7 @@ const Home: NextPage = () => {
                 <td className="flex flex-col space-y-2">
                   <VerificationButton transactionId={repository.fabric_tag} label="fabric" verificationUrl="https://apiroom.net/api/zenbridge/fabric-read" verificationParam="myFabricTag" />
                   <VerificationButton transactionId={repository.sawroom_tag} label="sawroom" verificationUrl="https://apiroom.net/api/zenbridge/sawroom-read" verificationParam="mySawroomTag" />
-                  <VerificationButton transactionId={repository.ethereum_tag} label="ethereum" verificationUrl="https://apiroom.net/api/zenbridge/ethereum-read" verificationParam="txid" />
+                  <VerificationButton transactionId={repository.ethereum_tag} label="ethereum" verificationUrl="https://apiroom.net/api/zenbridge/ethereum-retrieve" verificationParam="txid" />
                 </td>
                 <td>
                   <div className="flex flex-col space-y-2">
