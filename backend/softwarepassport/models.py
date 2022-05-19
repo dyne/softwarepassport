@@ -1,16 +1,18 @@
 import enum
+import errno
+import json
 import logging
+import shutil
 import tempfile
 from datetime import datetime
 from io import StringIO
 
 import git
-import json
 import requests
 from reuse import lint
 from reuse.project import Project as ReuseProject
 from scancode.cli import run_scan
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Enum, desc
+from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String, desc
 from sqlalchemy.orm import Session
 
 from .config import settings
@@ -66,6 +68,13 @@ class Project(Base):
         self.hash = h
         self.save(db=db)
         return False
+
+    def cleanup(self):
+      try:
+        shutil.rmtree(self.path)  # delete directory
+      except OSError as exc:
+        if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
+            raise  # re-raise exception
 
     def reuse(self, db: Session):
         L.info("Running reuse for %s", self.url)
@@ -152,6 +161,7 @@ class Project(Base):
             self.scancode(db)
 
         self.save(db)
+        self.cleanup()
 
     def save(self, db: Session):
         self.date_last_updated = datetime.utcnow()
