@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 interface VProps {
   transactionId: string;
@@ -7,7 +7,7 @@ interface VProps {
   verificationParam: string;
 }
 
-const VerificationButton = ({transactionId, label, verificationUrl, verificationParam}: VProps) => {
+const VerificationButton = ({ transactionId, label, verificationUrl, verificationParam }: VProps) => {
   const [data, setData] = useState({});
   const options = {
     method: "POST",
@@ -24,8 +24,8 @@ const VerificationButton = ({transactionId, label, verificationUrl, verification
 
   useEffect(() => {
     try {
-      fetch(verificationUrl, options).then(r => r.json().then(r => {setData(r)}));
-    } catch (e) {}
+      fetch(verificationUrl, options).then(r => r.json().then(r => { setData(r) }));
+    } catch (e) { }
   }, [transactionId]);
 
 
@@ -36,10 +36,12 @@ const VerificationButton = ({transactionId, label, verificationUrl, verification
 
         <input type="checkbox" id={transactionId} className="modal-toggle" />
         <div className="modal">
-          <div className="relative text-left modal-box max-w-full min-w-fit">
+          <div className="relative max-w-full text-left modal-box min-w-fit">
             <label htmlFor={transactionId} className="absolute btn btn-sm btn-circle right-2 top-2">✕</label>
-            <h3 className="text-lg font-bold">Congratulations this is notarized on {label}!</h3>
-            <pre className="py-4 break-all whitespace-normal max-w-full">{JSON.stringify(data, null, 2)}</pre>
+            <h3 className="pb-8 text-lg font-bold">Congratulations this is notarized on {label}!</h3>
+            <span className="font-bold">Transaction tag:</span> <span className="font-mono font-bold text-error">{transactionId}</span>
+            <h4 className="my-4 font-bold">Notarized data:</h4>
+            <pre className="max-w-full p-4 my-2 overflow-auto break-all rounded bg-slate-900 text-slate-200">{JSON.stringify(data, null, 2)}</pre>
           </div>
         </div>
       </>}
