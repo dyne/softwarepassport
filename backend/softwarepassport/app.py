@@ -89,6 +89,12 @@ def create_or_update_a_new_repository(
                 status_code=424,
                 detail=f"Oops {repository.url} is not a valid git repository",
             )
+    else:
+        raise HTTPException(
+            status_code=409,
+            detail=f"{repository.url} was already processed, if repository head changed the results will be updated",
+        )
+
     return repo
 
 
