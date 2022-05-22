@@ -116,7 +116,7 @@ class Project(Base):
             (settings.SAWROOM, "mySawroomTag", "sawroom_tag"),
             (settings.FABRIC, "myFabricTag", "fabric_tag"),
             (settings.ETHEREUM, "txid", "ethereum_tag"),
-            (settings.PLANETMINT, "txid", "planetmint_tag"),
+            (settings.PLANETMINT, "txId", "planetmint_tag"),
         ]
         data = dict(
             data=dict(
