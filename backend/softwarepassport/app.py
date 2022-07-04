@@ -1,3 +1,4 @@
+import json
 import logging
 
 import uvicorn
@@ -66,6 +67,7 @@ def list_all_repositories(db: Session = Depends(get_db)):
     repos = Project.all(db)
     for r in repos:
         r.status = AuditLog.last_status(r.url, db)
+        r.scancode_report = json.loads(r.scancode_report)
     return repos
 
 
@@ -95,6 +97,7 @@ def create_or_update_a_new_repository(
             detail=f"{repository.url} was already processed, if repository head changed the results will be updated",
         )
 
+	repo.scancode_report = json.loads(repo.scancode_report)
     return repo
 
 
