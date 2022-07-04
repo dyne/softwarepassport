@@ -103,6 +103,7 @@ class Project(Base):
                 self.path,
                 license=True,
                 copyright=True,
+                email=True,
                 consolidate=True,
                 strip_root=True,
                 n=8,
