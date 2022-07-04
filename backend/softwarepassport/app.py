@@ -97,7 +97,6 @@ def create_or_update_a_new_repository(
             detail=f"{repository.url} was already processed, if repository head changed the results will be updated",
         )
 
-    repo.scancode_report = json.loads(repo.scancode_report)
     return repo
 
 
