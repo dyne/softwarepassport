@@ -164,7 +164,7 @@ class Project(Base):
             if force:
                 L.debug("Force scanning project %s", self.url)
                 self.scancode(db)
-            elif not not self.scancode_report:
+            elif not self.scancode_report:
                 self.scancode(db)
             else:
                 self.__log(db, State.SCANCODE_START)
