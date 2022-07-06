@@ -133,12 +133,13 @@ class Project(Base):
         self.__log(db, State.BLOCKCHAIN_START)
         for (url, param, tag) in blockchains:
             try:
-                r = requests.post(url, json=data)
+                r = requests.post(url, json=data, timeout=10)
                 setattr(self, tag, r.json()[param])
                 L.debug("Blockchain response to %s: %s", url, r.json())
             except Exception as e:
                 L.exception(f"Failed to post to blockchain {url}", e)
-                continue
+                self.__log(db, State.BLOCKCHAIN_END)
+                pass
         self.__log(db, State.BLOCKCHAIN_END)
 
     def scan(self, db: Session):
@@ -157,7 +158,10 @@ class Project(Base):
                     self.ethereum_tag,
                     self.planetmint_tag,
                 ]:
-                    self.blockchain(db)
+                    try:
+                      self.blockchain(db)
+                    except Exception as e:
+                      pass
                 else:
                     self.__log(db, State.BLOCKCHAIN_START)
                     self.__log(db, State.BLOCKCHAIN_END)
