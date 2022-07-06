@@ -13,7 +13,7 @@ from reuse import lint
 from reuse.project import Project as ReuseProject
 from scancode.cli import run_scan
 from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String, desc
-from sqlalchemy.orm import Session, deferred
+from sqlalchemy.orm import Session, deferred, undefer
 
 from .config import settings
 from .database import Base
@@ -121,7 +121,7 @@ class Project(Base):
             (settings.SAWROOM, "mySawroomTag", "sawroom_tag"),
             (settings.FABRIC, "myFabricTag", "fabric_tag"),
             (settings.ETHEREUM, "txid", "ethereum_tag"),
-            (settings.PLANETMINT, "input", "planetmint_tag"),
+            (settings.PLANETMINT, "txid", "planetmint_tag"),
         ]
         data = dict(
             data=dict(
@@ -203,6 +203,7 @@ class Project(Base):
         return (
             db.query(cls)
             .order_by(desc(cls.date_created))
+            .options(undefer("scancode_report"))
             .offset(skip)
             .limit(limit)
             .all()

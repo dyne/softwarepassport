@@ -137,7 +137,7 @@ const Home: NextPage = () => {
                   <VerificationButton transactionId={repository.fabric_tag} label="fabric" verificationUrl="https://apiroom.net/api/zenbridge/fabric-read" verificationParam="myFabricTag" />
                   <VerificationButton transactionId={repository.sawroom_tag} label="sawroom" verificationUrl="https://apiroom.net/api/zenbridge/sawroom-read" verificationParam="mySawroomTag" />
                   <VerificationButton transactionId={repository.ethereum_tag} label="ethereum" verificationUrl="https://apiroom.net/api/zenbridge/ethereum-retrieve" verificationParam="txid" />
-                  <VerificationButton transactionId={repository.planetmint_tag} label="planetmint" verificationUrl="https://apiroom.net/api/zenbridge/planetmint-read" verificationParam="txId" />
+                  <VerificationButton transactionId={repository.planetmint_tag} label="planetmint" verificationUrl="https://apiroom.net/api/zenbridge/planetmint-read" verificationParam="txid" />
                 </td>
                 <td>
                   <div className="flex flex-col space-y-2">
@@ -148,7 +148,7 @@ const Home: NextPage = () => {
                         <input type="checkbox" id={repository.hash} className="modal-toggle" />
                         <label htmlFor={repository.hash} className="cursor-pointer modal">
                           <label className="relative min-w-fit modal-box" htmlFor="">
-                            <CopyrightHolders holders={(repository.scancode_report)?.consolidated_components} />
+                            <CopyrightHolders holders={JSON.parse(repository.scancode_report)?.consolidated_components || []} />
                           </label>
                         </label>
 
