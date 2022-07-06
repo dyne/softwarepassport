@@ -62,6 +62,13 @@ async def root(request: Request):
     return url_list
 
 
+@app.get("/repo_summary")
+def list_repositories(db: Session = Depends(get_db)):
+    repos = Project.all_by(db)
+    for r in repos:
+        r.status = AuditLog.last_status(r.url, db)
+    return repos
+
 @app.get("/repositories")
 def list_all_repositories(db: Session = Depends(get_db)):
     repos = Project.all(db)
@@ -91,7 +98,7 @@ def create_or_update_a_new_repository(
         except git.exc.GitCommandError as e:
             L.exception(e)
             raise HTTPException(
-                status_code=424,
+                status_code=206,
                 detail=f"Oops {repository.url} is not a valid git repository",
             )
     else:

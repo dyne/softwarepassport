@@ -13,7 +13,7 @@ from reuse import lint
 from reuse.project import Project as ReuseProject
 from scancode.cli import run_scan
 from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String, desc
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, deferred
 
 from .config import settings
 from .database import Base
@@ -41,7 +41,7 @@ class Project(Base):
     hash = Column(String)
     reuse_compliant = Column(Boolean, default=False)
     reuse_report = Column(String, default=None)
-    scancode_report = Column(String, default=None)
+    scancode_report = deferred(Column(String, default=None))
     sawroom_tag = Column(String, index=True, default=None)
     fabric_tag = Column(String, index=True, default=None)
     ethereum_tag = Column(String, index=True, default=None)
@@ -117,7 +117,7 @@ class Project(Base):
             (settings.SAWROOM, "mySawroomTag", "sawroom_tag"),
             (settings.FABRIC, "myFabricTag", "fabric_tag"),
             (settings.ETHEREUM, "txid", "ethereum_tag"),
-            (settings.PLANETMINT, "txId", "planetmint_tag"),
+            (settings.PLANETMINT, "input", "planetmint_tag"),
         ]
         data = dict(
             data=dict(
@@ -133,36 +133,39 @@ class Project(Base):
                 setattr(self, tag, r.json()[param])
                 L.debug("Blockchain response to %s: %s", url, r.json())
             except Exception as e:
-                L.exception("Failed to post to blockchain", e)
+                L.exception(f"Failed to post to blockchain {url}", e)
                 continue
         self.__log(db, State.BLOCKCHAIN_END)
 
     def scan(self, db: Session):
         L.debug("Scanning project %s", self.url)
-        existing = self.clone(db)
-        if existing:
-            if not self.reuse_report:
-                self.reuse(db)
-            else:
-                self.__log(db, State.REUSE_START)
-                self.__log(db, State.REUSE_END)
-            if None in [self.sawroom_tag, self.fabric_tag, self.ethereum_tag, self.planetmint_tag]:
-                self.blockchain(db)
-            else:
-                self.__log(db, State.BLOCKCHAIN_START)
-                self.__log(db, State.BLOCKCHAIN_END)
-            if not self.scancode_report:
-                self.scancode(db)
-            else:
-                self.__log(db, State.SCANCODE_START)
-                self.__log(db, State.SCANCODE_END)
-        else:
-            self.reuse(db)
-            self.blockchain(db)
-            self.scancode(db)
+        try:
+          existing = self.clone(db)
+          if existing:
+              if not self.reuse_report:
+                  self.reuse(db)
+              else:
+                  self.__log(db, State.REUSE_START)
+                  self.__log(db, State.REUSE_END)
+              if None in [self.sawroom_tag, self.fabric_tag, self.ethereum_tag, self.planetmint_tag]:
+                  self.blockchain(db)
+              else:
+                  self.__log(db, State.BLOCKCHAIN_START)
+                  self.__log(db, State.BLOCKCHAIN_END)
+              if not self.scancode_report:
+                  self.scancode(db)
+              else:
+                  self.__log(db, State.SCANCODE_START)
+                  self.__log(db, State.SCANCODE_END)
+          else:
+              self.reuse(db)
+              self.blockchain(db)
+              self.scancode(db)
 
-        self.save(db)
-        self.cleanup()
+          self.save(db)
+          self.cleanup()
+        except Exception as e:
+          self.cleanup()
 
     def save(self, db: Session):
         self.date_last_updated = datetime.utcnow()
@@ -185,7 +188,7 @@ class Project(Base):
     def all_by(
         cls, db: Session, skip: int = 0, limit: int = settings.PAGINATION_WINDOW
     ):
-        return db.query(cls).offset(skip).limit(limit).all()
+        return db.query(cls).order_by(desc(cls.date_created)).offset(skip).limit(limit).all()
 
     def __log(self, db: Session, state: State, output: str = None):
         latest = AuditLog.latest(self.url, db)

@@ -18,7 +18,7 @@ interface Repository {
   date_last_updated: string;
   date_created: string;
   reuse_compliant: boolean;
-  scancode_report: string;
+  scancode_report: any;
   reuse_report: string;
   fabric_tag: string;
   sawroom_tag: string;
@@ -30,7 +30,7 @@ interface Repository {
 }
 
 const Home: NextPage = () => {
-  const {data, error} = useSwr(`${API_URL}/repositories`)
+  const {data, error} = useSwr(`${API_URL}/repo_summary`)
   const [repo, addRepo] = useState("")
   const [alert, setAlert] = useState("")
   const [alertType, setAlertType] = useState("")
@@ -130,7 +130,7 @@ const Home: NextPage = () => {
                   </div>
                 </td>
                 <td>
-                  <StatusBar status={repository.status} />
+                  <StatusBar status={repository.status || []} />
                 </td>
                 <td>{repository.reuse_compliant ? "✅" : "🚫"}</td>
                 <td className="flex flex-col space-y-2">
@@ -142,7 +142,7 @@ const Home: NextPage = () => {
                 <td>
                   <div className="flex flex-col space-y-2">
                     {
-                      repository.scancode_report && <>
+                      repository?.scancode_report && <>
                         <label htmlFor={repository.hash} className="btn btn-xs modal-button">scancode result</label>
 
                         <input type="checkbox" id={repository.hash} className="modal-toggle" />
