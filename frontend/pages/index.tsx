@@ -106,8 +106,8 @@ const Home: NextPage = () => {
       {alert &&
         <Alert message={alert} type={alertType} />
       }
-      <div className="w-full pt-10 mt-2 overflow-x-auto">
-        <table className="table min-w-full text-center">
+      <div className="w-full pt-10 mt-2">
+        <table className="table text-center w-full">
           <thead>
             <tr>
               <th>Repo</th>
@@ -121,12 +121,10 @@ const Home: NextPage = () => {
             {data?.map((repository: Repository) => (
               <tr key={repository.url}>
                 <td>
-                  <div className="flex items-center space-x-3">
-                    <div>
-                      <div className="font-bold"><a href={repository.url}>{repository.url}</a></div>
-                      <div className="text-sm opacity-50">head: {repository.hash}</div>
-                      <div className="text-sm opacity-40">updated {dayjs().to(repository.date_last_updated || repository.date_created)}</div>
-                    </div>
+                  <div className="flex flex-col items-start">
+                    <div className="font-semibold text-sm text-left w-96 overflow-auto"><a href={repository.url}>{repository.url}</a></div>
+                    <div className="text-sm opacity-50">head: {repository.hash}</div>
+                    <div className="text-sm opacity-40">updated {dayjs().to(repository.date_last_updated || repository.date_created)}</div>
                   </div>
                 </td>
                 <td>

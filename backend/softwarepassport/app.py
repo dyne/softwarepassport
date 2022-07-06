@@ -64,7 +64,7 @@ async def root(request: Request):
 
 @app.get("/repo_summary")
 def list_repositories(db: Session = Depends(get_db)):
-    repos = Project.all_by(db)
+    repos = Project.all_by(db, limit=20)
     for r in repos:
         r.status = AuditLog.last_status(r.url, db)
     return repos
