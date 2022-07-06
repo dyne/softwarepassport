@@ -1,4 +1,3 @@
-import json
 import logging
 
 import uvicorn
@@ -67,7 +66,6 @@ def list_all_repositories(db: Session = Depends(get_db)):
     repos = Project.all(db)
     for r in repos:
         r.status = AuditLog.last_status(r.url, db)
-        r.scancode_report = json.loads(r.scancode_report)
     return repos
 
 
@@ -101,15 +99,16 @@ def create_or_update_a_new_repository(
 
 
 @celery.task
-def scan_task(url):
+def scan_task(url, force):
     db = next(get_db())
     repo = Project.by_url(url, db)
-    repo.scan(db)
+    repo.scan(db, force)
 
 
 @app.post("/scan", status_code=HTTP_202_ACCEPTED)
 async def scan(
     repository: RepoBase,
+    force: bool = False,
     db: Session = Depends(get_db),
 ):
     """
@@ -119,7 +118,7 @@ async def scan(
     if not repo:
         raise HTTPException(status_code=404, detail="Repository not found")
 
-    scan_task.delay(repository.url)
+    scan_task.delay(repository.url, force)
     return {"message": "Scan queued visit the status on /status"}
 
 

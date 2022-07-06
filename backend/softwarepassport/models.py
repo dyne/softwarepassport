@@ -12,7 +12,7 @@ import requests
 from reuse import lint
 from reuse.project import Project as ReuseProject
 from scancode.cli import run_scan
-from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String, desc
+from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String, desc, types
 from sqlalchemy.orm import Session
 
 from .config import settings
@@ -34,6 +34,16 @@ class State(enum.Enum):
     SCANCODE_END = 8
 
 
+class ScancodeReport(types.TypeDecorator):
+    impl = types.String
+    cache_ok = True
+
+    def process_result_value(self, val, dialect):
+        if val:
+            return json.loads(val)
+        return val
+
+
 class Project(Base):
     __tablename__ = "projects"
 
@@ -41,7 +51,7 @@ class Project(Base):
     hash = Column(String)
     reuse_compliant = Column(Boolean, default=False)
     reuse_report = Column(String, default=None)
-    scancode_report = Column(String, default=None)
+    scancode_report = Column(ScancodeReport, default=None)
     sawroom_tag = Column(String, index=True, default=None)
     fabric_tag = Column(String, index=True, default=None)
     ethereum_tag = Column(String, index=True, default=None)
@@ -137,7 +147,7 @@ class Project(Base):
                 continue
         self.__log(db, State.BLOCKCHAIN_END)
 
-    def scan(self, db: Session):
+    def scan(self, db: Session, force: bool):
         L.debug("Scanning project %s", self.url)
         existing = self.clone(db)
         if existing:
@@ -151,7 +161,10 @@ class Project(Base):
             else:
                 self.__log(db, State.BLOCKCHAIN_START)
                 self.__log(db, State.BLOCKCHAIN_END)
-            if not self.scancode_report:
+            if force:
+                L.debug("Force scanning project %s", self.url)
+                self.scancode(db)
+            elif not not self.scancode_report:
                 self.scancode(db)
             else:
                 self.__log(db, State.SCANCODE_START)
