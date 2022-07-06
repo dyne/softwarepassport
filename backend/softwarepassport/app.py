@@ -65,10 +65,13 @@ async def root(request: Request):
 @app.get("/repositories")
 def list_all_repositories(db: Session = Depends(get_db)):
     repos = Project.all(db)
+    result = []
     for r in repos:
         r.status = AuditLog.last_status(r.url, db)
-        r.scancode_report = json.loads(r.scancode_report)
-    return repos
+        tr = r.__dict__
+        tr['scancode_report'] = json.loads(r.scancode_report) if r.scancode_report else None
+        result.append(tr)
+    return result
 
 
 @app.post("/repository", status_code=HTTP_201_CREATED)

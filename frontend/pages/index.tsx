@@ -148,7 +148,7 @@ const Home: NextPage = () => {
                         <input type="checkbox" id={repository.hash} className="modal-toggle" />
                         <label htmlFor={repository.hash} className="cursor-pointer modal">
                           <label className="relative min-w-fit modal-box" htmlFor="">
-                            <CopyrightHolders holders={JSON.parse(repository.scancode_report)?.consolidated_components} />
+                            <CopyrightHolders holders={(repository.scancode_report)?.consolidated_components} />
                           </label>
                         </label>
 
