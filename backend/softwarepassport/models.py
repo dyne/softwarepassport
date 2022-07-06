@@ -147,7 +147,7 @@ class Project(Base):
                 continue
         self.__log(db, State.BLOCKCHAIN_END)
 
-    def scan(self, db: Session):
+    def scan(self, db: Session, force: bool):
         L.debug("Scanning project %s", self.url)
         existing = self.clone(db)
         if existing:
@@ -161,7 +161,10 @@ class Project(Base):
             else:
                 self.__log(db, State.BLOCKCHAIN_START)
                 self.__log(db, State.BLOCKCHAIN_END)
-            if not self.scancode_report:
+            if force:
+                L.debug("Force scanning project %s", self.url)
+                self.scancode(db)
+            elif not not self.scancode_report:
                 self.scancode(db)
             else:
                 self.__log(db, State.SCANCODE_START)
