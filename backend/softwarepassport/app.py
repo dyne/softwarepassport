@@ -96,14 +96,13 @@ def create_or_update_a_new_repository(
             repo.clone(db)
             repo.save(db)
         except git.exc.GitCommandError as e:
-            L.exception(e)
             raise HTTPException(
                 status_code=206,
                 detail=f"Oops {repository.url} is not a valid git repository",
             )
     else:
         raise HTTPException(
-            status_code=409,
+            status_code=206,
             detail=f"{repository.url} was already processed, if repository head changed the results will be updated",
         )
 

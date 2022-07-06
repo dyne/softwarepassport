@@ -57,9 +57,13 @@ class Project(Base):
     def clone(self, db: Session):
         if not getattr(self, "path", False):
             self.path = tempfile.mkdtemp()
-        L.info("Cloning project %s", self.url)
         self.__log(db, State.CLONE_START)
-        repo = git.Repo.clone_from(self.url, self.path, depth=1)
+        try:
+            repo = git.Repo.clone_from(self.url, self.path, depth=1)
+            L.info("Cloned project %s", self.url)
+        except Exception as e:
+            self.cleanup()
+            raise e
         self.__log(db, State.CLONE_END)
         h = repo.head.object.hexsha
         existing = Project.by_url(self.url, db)
@@ -70,11 +74,11 @@ class Project(Base):
         return False
 
     def cleanup(self):
-      try:
-        shutil.rmtree(self.path)  # delete directory
-      except OSError as exc:
-        if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
-            raise  # re-raise exception
+        try:
+            shutil.rmtree(self.path)  # delete directory
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
+                raise  # re-raise exception
 
     def reuse(self, db: Session):
         L.info("Running reuse for %s", self.url)
@@ -138,39 +142,47 @@ class Project(Base):
         self.__log(db, State.BLOCKCHAIN_END)
 
     def scan(self, db: Session):
-        L.debug("Scanning project %s", self.url)
         try:
-          existing = self.clone(db)
-          if existing:
-              if not self.reuse_report:
-                  self.reuse(db)
-              else:
-                  self.__log(db, State.REUSE_START)
-                  self.__log(db, State.REUSE_END)
-              if None in [self.sawroom_tag, self.fabric_tag, self.ethereum_tag, self.planetmint_tag]:
-                  self.blockchain(db)
-              else:
-                  self.__log(db, State.BLOCKCHAIN_START)
-                  self.__log(db, State.BLOCKCHAIN_END)
-              if not self.scancode_report:
-                  self.scancode(db)
-              else:
-                  self.__log(db, State.SCANCODE_START)
-                  self.__log(db, State.SCANCODE_END)
-          else:
-              self.reuse(db)
-              self.blockchain(db)
-              self.scancode(db)
+            existing = self.clone(db)
+            L.debug("Scanning project %s", self.url)
+            if existing:
+                if not self.reuse_report:
+                    self.reuse(db)
+                else:
+                    self.__log(db, State.REUSE_START)
+                    self.__log(db, State.REUSE_END)
+                if None in [
+                    self.sawroom_tag,
+                    self.fabric_tag,
+                    self.ethereum_tag,
+                    self.planetmint_tag,
+                ]:
+                    self.blockchain(db)
+                else:
+                    self.__log(db, State.BLOCKCHAIN_START)
+                    self.__log(db, State.BLOCKCHAIN_END)
+                if not self.scancode_report:
+                    self.scancode(db)
+                else:
+                    self.__log(db, State.SCANCODE_START)
+                    self.__log(db, State.SCANCODE_END)
+            else:
+                self.reuse(db)
+                self.blockchain(db)
+                self.scancode(db)
 
-          self.save(db)
-          self.cleanup()
+            self.save(db)
+            self.cleanup()
         except Exception as e:
-          self.cleanup()
+            pass
 
     def save(self, db: Session):
         self.date_last_updated = datetime.utcnow()
         db.merge(self)
         db.flush()
+
+    def delete(self, db: Session):
+        db.delete(self)
 
     @classmethod
     def by_hash(cls, url: str, hash: str, db: Session):
@@ -188,7 +200,13 @@ class Project(Base):
     def all_by(
         cls, db: Session, skip: int = 0, limit: int = settings.PAGINATION_WINDOW
     ):
-        return db.query(cls).order_by(desc(cls.date_created)).offset(skip).limit(limit).all()
+        return (
+            db.query(cls)
+            .order_by(desc(cls.date_created))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def __log(self, db: Session, state: State, output: str = None):
         latest = AuditLog.latest(self.url, db)
