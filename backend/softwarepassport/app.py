@@ -1,4 +1,3 @@
-import json
 import logging
 
 import uvicorn
@@ -67,7 +66,6 @@ def list_all_repositories(db: Session = Depends(get_db)):
     repos = Project.all(db)
     for r in repos:
         r.status = AuditLog.last_status(r.url, db)
-        r.scancode_report = json.loads(r.scancode_report)
     return repos
 
 
